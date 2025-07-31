@@ -92,6 +92,30 @@ alias ll='ls -alF'
 alias la='ls -A'
 alias l='ls -CF'
 alias v="nvim"
+alias lzd='sudo docker run --rm -it -v /var/run/docker.sock:/var/run/docker.sock -v $HOME/.config/lazydocker/config:/.config/jesseduffield/lazydocker lazyteam/lazydocker'
+alias alcatel='ssh -o HostKeyAlgorithms=+ssh-dss -m hmac-sha1 -o PubkeyAuthentication=no -o PreferredAuthentications=password'
+alias cuslow='cu -l /dev/ttyUSB0 -s 9600'
+alias cufast='cu -l /dev/ttyUSB0 -s 115200'
+
+#yazi
+function y() {
+  local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
+  yazi "$@" --cwd-file="$tmp"
+  IFS= read -r -d '' cwd <"$tmp"
+  [ -n "$cwd" ] && [ "$cwd" != "$PWD" ] && builtin cd -- "$cwd"
+  rm -f -- "$tmp"
+}
+
+#tmux fzf
+tm() {
+  [[ -n "$TMUX" ]] && change="switch-client" || change="attach-session"
+  if [ "$1" ]; then
+    tmux "$change" -d -t "$1" 2>/dev/null || (tmux new-session -d -s "$1" && tmux "$change" -d -t "$1")
+    return
+  fi
+  session=$(tmux list-sessions -F "#{session_name}" 2>/dev/null | fzf --exit-0) && tmux "$change" -t "$session" || echo "No sessions found."
+}
+
 # Add an "alert" alias for long running commands.  Use like so:
 #   sleep 10; alert
 alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
